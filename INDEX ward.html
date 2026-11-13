@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F9F8F6">
+  <meta name="description" content="Uno studio privato per comporre e salvare i tuoi look.">
+  <title>Atelier — Virtual Wardrobe</title>
+  <link rel="stylesheet" href="./styles.css?v=15">
+</head>
+<body>
+  <div class="app" id="wardrobeApp">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Atelier, guardaroba digitale" style="color:inherit;text-decoration:none">
+        <span class="brand-mark" aria-hidden="true">a</span>
+        <span class="brand-name">atelier <span>· wardrobe</span></span>
+      </a>
+      <nav class="primary-nav" id="primaryNavigation" aria-label="Navigazione principale">
+        <button class="nav-button is-active" type="button" data-screen-target="wardrobe">Guardaroba</button>
+        <button class="nav-button" type="button" data-screen-target="laundry">Lavatrice</button>
+        <button class="nav-button" type="button" data-screen-target="archive">Archivio</button>
+      </nav>
+      <div class="header-right">
+        <div class="private-label"><span class="private-dot"></span>Solo questo dispositivo</div>
+      </div>
+    </header>
+
+    <div class="app-grid app-screen" id="wardrobeScreen" data-screen-panel="wardrobe">
+      <aside class="wardrobe" aria-labelledby="wardrobeTitle">
+        <div class="side-heading">
+          <div>
+            <p class="overline">Collezione personale</p>
+            <h2 id="wardrobeTitle">Guardaroba</h2>
+          </div>
+          <span class="item-total" id="itemCount">0 capi</span>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+          <p class="upload-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M20 16.5v2A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5v-2"/></svg>
+            Aggiungi un capo
+          </p>
+          <p class="upload-copy">Carica una foto pulita del capo. JPG, PNG o WEBP, max 10 MB.</p>
+          <div class="upload-row">
+            <select class="category-select" id="uploadCategory" aria-label="Categoria del capo">
+              <option value="top">Parte superiore</option>
+              <option value="bottom">Parte inferiore</option>
+              <option value="outerwear">Capospalla</option>
+              <option value="shoes">Scarpe</option>
+              <option value="head">Accessori · testa</option>
+              <option value="accessory">Accessori · altro</option>
+            </select>
+            <div class="upload-actions">
+              <label class="file-label" for="galleryInput"><span class="button button-accent">Galleria</span></label>
+              <input class="file-input" id="galleryInput" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+              <label class="file-label" for="fileInput"><span class="button button-quiet">File</span></label>
+              <input class="file-input" id="fileInput" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple>
+              <button class="button button-quiet camera-button" id="openCamera" type="button">Scatta foto</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-list" id="categoryList" role="group" aria-label="Filtra guardaroba">
+          <button class="category-tab active" type="button" data-filter="all">Tutti</button>
+          <button class="category-tab" type="button" data-filter="top">Top</button>
+          <button class="category-tab" type="button" data-filter="bottom">Pantaloni</button>
+          <button class="category-tab" type="button" data-filter="outerwear">Capispalla</button>
+          <button class="category-tab" type="button" data-filter="shoes">Scarpe</button>
+          <button class="category-tab" type="button" data-filter="accessories">Extra</button>
+        </div>
+        <div class="clothing-grid" id="clothingGrid" aria-live="polite"></div>
+        <div class="closet-note">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
+          Foto e look restano in questo browser. L’AI non viene contattata senza la tua conferma.
+        </div>
+      </aside>
+
+      <main class="stage-column" aria-labelledby="stageTitle">
+        <div class="stage-topline">
+          <div>
+            <p class="overline">Studio di composizione</p>
+            <h1 class="stage-title" id="stageTitle">Il tuo fitting room</h1>
+            <p class="stage-subtitle">Un avatar 3D da esplorare, un look da costruire.</p>
+          </div>
+          <div class="stage-tools">
+            <div class="gender-switch" role="group" aria-label="Seleziona avatar">
+              <button class="gender-button" type="button" data-gender="man" aria-pressed="false">Man</button>
+              <button class="gender-button is-active" type="button" data-gender="woman" aria-pressed="true">Woman</button>
+            </div>
+            <div class="model-status"><span class="status-dot"></span><span id="modelStatus">Modello 3D pronto</span></div>
+          </div>
+        </div>
+        <section class="viewport" id="viewport" aria-label="Avatar tridimensionale interattivo">
+          <div class="avatar-loading" id="avatarLoading" aria-live="polite">
+            <span class="loading-spinner" aria-hidden="true"></span>
+            <span id="avatarLoadingText">Caricamento dei modelli 3D…</span>
+          </div>
+          <canvas class="avatar-canvas" id="avatarCanvas" aria-label="Avatar 3D ruotabile"></canvas>
+          <div class="viewport-caption">Atelier avatar &nbsp;·&nbsp; 01</div>
+          <div class="view-controls" aria-label="Controlli vista avatar">
+            <button class="view-button" id="frontView" type="button" aria-label="Vista frontale" title="Vista frontale">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+            </button>
+            <button class="view-button" id="rotateView" type="button" aria-label="Attiva o ferma rotazione automatica" title="Rotazione automatica">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.64 9A7 7 0 0 1 17.8 6.2L20 12M4 12l2.2 5.8A7 7 0 0 0 18.36 15"/></svg>
+            </button>
+          </div>
+          <div class="avatar-error" id="avatarError" hidden>Il motore 3D non è disponibile. Controlla la connessione per caricare Three.js oppure prova con un browser compatibile WebGL.</div>
+          <div class="result-overlay" id="tryOnResult" hidden>
+            <img id="tryOnImage" alt="Risultato della prova virtuale AI">
+            <div class="result-label"><span>Anteprima AI · immagine 2D</span><button class="result-close" id="closeResult" type="button" aria-label="Chiudi anteprima">×</button></div>
+          </div>
+          <div class="orbit-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><path d="m17 2 5 0 0 5"/></svg>
+            Trascina per ruotare · scroll per zoom
+          </div>
+        </section>
+        <div class="viewport-footer">
+          <div class="avatar-caption"><strong>Modello 3D</strong> &nbsp;·&nbsp; GLB selezionato</div>
+          <div class="zoom-label">360° · WebGL</div>
+        </div>
+        <section class="wardrobe-carousel" aria-label="Selezione capi">
+          <div class="carousel-toolbar">
+            <div class="carousel-categories" id="carouselCategories" role="group" aria-label="Categorie del carosello">
+              <button class="carousel-category is-active" type="button" data-carousel-category="top" aria-pressed="true">Top</button>
+              <button class="carousel-category" type="button" data-carousel-category="bottom" aria-pressed="false">Pantaloni</button>
+              <button class="carousel-category" type="button" data-carousel-category="outerwear" aria-pressed="false">Capispalla</button>
+              <button class="carousel-category" type="button" data-carousel-category="shoes" aria-pressed="false">Scarpe</button>
+              <button class="carousel-category" type="button" data-carousel-category="accessories" aria-pressed="false">Accessori</button>
+            </div>
+            <label class="fit-control" for="garmentScale">
+              <span>Vestibilità</span>
+              <input id="garmentScale" type="range" min="80" max="120" value="100" step="1" aria-label="Regola la vestibilità dei capi">
+              <output id="garmentScaleValue" for="garmentScale">100%</output>
+            </label>
+          </div>
+          <div class="carousel-frame" id="carouselFrame" tabindex="0" role="group" aria-label="Carosello circolare dei capi">
+            <button class="carousel-arrow carousel-previous" id="carouselPrevious" type="button" aria-label="Capo precedente">‹</button>
+            <div class="carousel-track" id="carouselTrack"></div>
+            <button class="carousel-arrow carousel-next" id="carouselNext" type="button" aria-label="Capo successivo">›</button>
+            <span class="carousel-hint">Trascina un capo sul manichino · scorri per esplorare</span>
+          </div>
+        </section>
+      </main>
+
+      <aside class="inspector" aria-labelledby="lookTitle">
+        <div class="side-heading inspector-heading">
+          <div>
+            <p class="overline">Composizione</p>
+            <h2 id="lookTitle">Il tuo look</h2>
+          </div>
+          <button class="button button-text" id="clearLook" type="button">Svuota</button>
+        </div>
+        <div class="inspector-body">
+          <div class="look-summary">
+            <p class="summary-label">Look in lavorazione</p>
+            <h3 class="summary-name" id="lookName">Senza titolo</h3>
+            <p class="summary-caption" id="lookCaption">Seleziona un capo dal guardaroba per iniziare la composizione.</p>
+          </div>
+          <div class="outfit-list" id="outfitList"></div>
+          <div class="inspector-actions">
+            <button class="button button-accent" id="tryOnButton" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Prova virtuale AI
+            </button>
+            <button class="button button-quiet" id="saveLookButton" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
+              Salva look
+            </button>
+          </div>
+          <div class="integration-note">
+            <p class="integration-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 9v4m0 4h.01"/></svg>
+              Preview 3D &amp; AI
+            </p>
+            <p>I capi sono sagome 3D volumetriche dimostrative. Per simulare pieghe e vestibilità reali, collega un backend Virtual Try-On nella configurazione dell’app.</p>
+          </div>
+          <section class="saved-section" aria-labelledby="savedTitle">
+            <h3 class="saved-title" id="savedTitle">Look salvati</h3>
+            <div class="saved-list" id="savedList"></div>
+          </section>
+        </div>
+      </aside>
+    </div>
+
+    <section class="app-screen feature-screen laundry-screen" id="laundryScreen" data-screen-panel="laundry" hidden aria-labelledby="laundryTitle">
+      <div class="feature-heading">
+        <div><p class="overline">Cura dei capi</p><h1 id="laundryTitle">La tua lavatrice</h1><p class="feature-copy">I capi in ciclo restano qui finché non confermi che sono puliti e asciutti.</p></div>
+        <span class="screen-count" id="laundryCount">0 capi</span>
+      </div>
+      <div class="laundry-machine" aria-label="Illustrazione della lavatrice">
+        <div class="machine-top"><span></span><i></i><i></i></div>
+        <div class="machine-door"><div class="machine-glass"><div class="machine-water"></div><div class="machine-fabric"></div></div></div>
+        <div class="machine-controls"><span></span><span></span><span></span></div>
+        <div class="machine-caption">WASH · CARE · REPEAT</div>
+      </div>
+      <section class="laundry-carousel" aria-label="Capi attualmente in lavaggio">
+        <div class="carousel-frame laundry-carousel-frame" id="laundryCarouselFrame" tabindex="0" role="group" aria-label="Carosello circolare dei capi in lavaggio">
+          <div class="carousel-track" id="laundryCarouselTrack"></div>
+          <span class="carousel-hint">Scorri o trascina per sfogliare · seleziona un capo per confermarne il lavaggio</span>
+        </div>
+      </section>
+    </section>
+
+    <section class="app-screen feature-screen archive-screen" id="archiveScreen" data-screen-panel="archive" hidden aria-labelledby="archiveTitle">
+      <div class="feature-heading">
+        <div><p class="overline">Memoria del guardaroba</p><h1 id="archiveTitle">Archivio</h1><p class="feature-copy">I capi rimossi sono conservati solo in questo browser.</p></div>
+      </div>
+      <section class="profile-card archive-card" aria-labelledby="archiveListTitle"><div class="archive-heading"><div><p class="overline">Cronologia locale</p><h2 id="archiveListTitle">Capi rimossi</h2></div><span class="screen-count" id="archiveCount">0</span></div><div class="archive-list" id="archiveList"></div></section>
+    </section>
+  </div>
+
+  <dialog class="modal camera-dialog" id="cameraDialog" aria-labelledby="cameraDialogTitle">
+    <div class="modal-content">
+      <p class="modal-kicker">Nuovo capo</p>
+      <h2 id="cameraDialogTitle">Scatta una foto</h2>
+      <p>Inquadra il capo e tieni la fotocamera ferma. La foto viene elaborata e salvata in questo browser.</p>
+      <div class="camera-preview">
+        <video id="cameraPreview" autoplay playsinline muted></video>
+        <span class="camera-status" id="cameraStatus" role="status">Richiesta accesso alla fotocamera…</span>
+      </div>
+      <canvas id="cameraCanvas" hidden></canvas>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="closeCamera" type="button">Annulla</button>
+        <button class="button button-accent" id="capturePhoto" type="button" disabled>Scatta foto</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="washingDialog" aria-labelledby="washingDialogTitle">
+    <div class="modal-content">
+      <p class="modal-kicker">Guardaroba · lavanderia</p>
+      <h2 id="washingDialogTitle">Capo pronto da indossare?</h2>
+      <p><span id="washingItemName"></span>: capo pulito e asciutto? Conferma per renderlo pronto da indossare.</p>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="washingDialogCancel" type="button">Non ancora</button>
+        <button class="button button-accent" id="washingDialogConfirm" type="button">Sì, è pulito</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="saveDialog" aria-labelledby="saveDialogTitle">
+    <form class="modal-content" id="saveForm">
+      <p class="modal-kicker">Archivio personale</p>
+      <h2 id="saveDialogTitle">Salva questa composizione</h2>
+      <p>Il look sarà disponibile nella sezione Look salvati su questo dispositivo.</p>
+      <label class="field-label" for="lookNameInput">Nome del look</label>
+      <input class="text-field" id="lookNameInput" name="name" maxlength="40" placeholder="Es. Toni naturali" required>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="cancelSave" type="button">Annulla</button>
+        <button class="button button-accent" type="submit">Salva look</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="tryOnDialog" aria-labelledby="tryOnDialogTitle">
+    <form class="modal-content" id="tryOnForm">
+      <p class="modal-kicker">Virtual try-on</p>
+      <h2 id="tryOnDialogTitle">Anteprima con AI</h2>
+      <p id="tryOnInstructions">Per generare l’anteprima servono una foto della persona e un capo fotografato. Il backend configurato riceverà entrambe le immagini solo dopo la tua conferma.</p>
+      <label class="field-label" for="personPhoto">Foto della persona · frontale</label>
+      <input class="text-field" id="personPhoto" type="file" accept="image/jpeg,image/png,image/webp" required>
+      <label class="consent-row" for="tryOnConsent">
+        <input id="tryOnConsent" type="checkbox" required>
+        <span>Acconsento a inviare al backend configurato la foto della persona e il capo selezionato per generare il try-on.</span>
+      </label>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="cancelTryOn" type="button">Annulla</button>
+        <button class="button button-accent" id="generateTryOn" type="submit">Genera anteprima</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    (function () {
+      var assetVersion = "?v=15";
+      function loadOne(sources, done) {
+        var index = 0;
+        function tryNext() {
+          if (index >= sources.length) {
+            done(false);
+            return;
+          }
+          var script = document.createElement("script");
+          script.src = sources[index++];
+          script.onload = function () { done(true); };
+          script.onerror = function () {
+            script.remove();
+            tryNext();
+          };
+          document.head.appendChild(script);
+        }
+        tryNext();
+      }
+
+      function loadLocalScripts() {
+        loadOne(["./src/avatar3d.js" + assetVersion], function () {
+          loadOne(["./src/tryon-service.js" + assetVersion], function () {
+            loadOne(["./src/app.js" + assetVersion], function (loaded) {
+              if (!loaded) {
+                document.getElementById("modelStatus").textContent = "Applicazione non caricata";
+                document.getElementById("avatarError").hidden = false;
+              }
+            });
+          });
+        });
+      }
+
+      loadOne([
+        "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js",
+        "https://unpkg.com/three@0.128.0/build/three.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+      ], function (threeLoaded) {
+        if (!threeLoaded) {
+          loadLocalScripts();
+          return;
+        }
+        loadOne([
+          "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js",
+          "https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"
+        ], function () {
+          loadOne([
+            "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js",
+            "https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"
+          ], loadLocalScripts);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
